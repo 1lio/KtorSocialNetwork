@@ -60,11 +60,11 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override suspend fun repost(id: Long): PostModel? {
+    override suspend fun repostById(id: Long): PostModel? {
         TODO("Not yet implemented")
     }
 
-    override suspend fun share(id: Long): PostModel? {
+    override suspend fun shareById(id: Long): PostModel? {
         TODO("Not yet implemented")
     }
 }

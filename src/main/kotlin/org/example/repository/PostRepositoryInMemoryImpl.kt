@@ -68,11 +68,31 @@ class PostRepositoryInMemoryImpl : PostRepository {
             }
         }
 
-    override suspend fun repost(id: Long): PostModel? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun repostById(id: Long): PostModel? =
+        when (val index = items.indexOfFirst { it.id == id }) {
+            -1 -> null
+            else -> {
+                val item = items[index]
+                val copy = item.copy(
+                    repostByMe = true,
+                    repostCount = item.repostCount.inc()
+                )
+                items[index] = copy
+                copy
+            }
+        }
 
-    override suspend fun share(id: Long): PostModel? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun shareById(id: Long): PostModel? =
+        when (val index = items.indexOfFirst { it.id == id }) {
+            -1 -> null
+            else -> {
+                val item = items[index]
+                val copy = item.copy(
+                    sharedByMe = true,
+                    sharedCount = item.repostCount.inc()
+                )
+                items[index] = copy
+                copy
+            }
+        }
 }

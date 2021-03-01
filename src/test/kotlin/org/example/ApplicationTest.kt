@@ -31,20 +31,15 @@ class ApplicationTest {
                             "id": 0,
                             "author": "Vasya",
                             "content": "First post in our network!",
-                            "dateStamp": 1585637381,
+                            "date": 1585637381,
                             "likedByMe": 1,
                             "likedCount": 1,
                             "sharedByMe": false,
                             "sharedCount": 50,
-                            "commentsByMe": false,
-                            "commentsCount": 10,
                             "address": "address",
                             "lat": 55.75222,
                             "lng": 37.61556,
-                            "postType": "EVENT",
-                            "videoLink": null,
-                            "intentLink": null,
-                            "imageLink": null
+                            "postType": "EVENT"
                         }
                     """.trimIndent()
                 )

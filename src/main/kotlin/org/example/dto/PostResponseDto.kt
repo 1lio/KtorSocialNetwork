@@ -12,31 +12,37 @@ data class PostResponseDto(
     var likedCount: Int,
     var sharedByMe: Boolean,
     var sharedCount: Int,
-    var commentsByMe: Boolean,
-    var commentsCount: Int,
+    // var commentsByMe: Boolean,
+    // var commentsCount: Int,
     var address: String? = null,
     var lat: Double? = null,
     var lng: Double? = null,
+    var repostByMe: Boolean = false,
+    var repostCount: Int = 0,
     var postType: PostType,
     var videoUrl: String? = null,
+    var advUrl: String? = null
 ) {
     companion object {
         fun fromModel(model: PostModel) = PostResponseDto(
             id = model.id,
             author = model.author,
             content = model.content,
-            created = model.created,
+            created = model.date,
             likedByMe = model.likedByMe,
             likedCount = model.likedCount,
             sharedByMe = model.sharedByMe,
             sharedCount = model.sharedCount,
-            commentsByMe = model.commentsByMe,
-            commentsCount = model.commentsCount,
+            repostByMe = model.repostByMe,
+            repostCount = model.repostCount,
             address = model.address,
             lat = model.lat,
             lng = model.lng,
             postType = model.postType,
-            videoUrl = model.videoUrl
+            videoUrl = model.videoUrl,
+            advUrl = model.advUrl,
+            // commentsByMe = model.commentsByMe,
+            // commentsCount = model.commentsCount,
         )
     }
 }

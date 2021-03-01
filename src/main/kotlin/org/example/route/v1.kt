@@ -13,6 +13,7 @@ import org.kodein.di.generic.instance
 import org.kodein.di.ktor.kodein
 
 fun Routing.v1() {
+
     route("/api/v1/posts") {
 
         val repo by kodein().instance<PostRepository>()
@@ -29,26 +30,48 @@ fun Routing.v1() {
             call.respond(response)
         }
 
-        get("/{id}/like") {
+        post("/{id}/like") {
             val id = call.parameters["id"]?.toLongOrNull() ?: throw ParameterConversionException("id", "Long")
             val model = repo.likeById(id) ?: throw NotFoundException()
             val response = fromModel(model)
             call.respond(response)
         }
 
+        post("/{id}/dislike") {
+            val id = call.parameters["id"]?.toLongOrNull() ?: throw ParameterConversionException("id", "Long")
+            val model = repo.dislikeById(id) ?: throw NotFoundException()
+            val response = fromModel(model)
+            call.respond(response)
+        }
+
+        post("/{id}/repost") {
+            val id = call.parameters["id"]?.toLongOrNull() ?: throw ParameterConversionException("id", "Long")
+            val model = repo.repostById(id) ?: throw NotFoundException()
+            val response = fromModel(model)
+            call.respond(response)
+        }
+
+        post("/{id}/share") {
+            val id = call.parameters["id"]?.toLongOrNull() ?: throw ParameterConversionException("id", "Long")
+            val model = repo.shareById(id) ?: throw NotFoundException()
+            val response = fromModel(model)
+            call.respond(response)
+        }
+
+
         post {
             val input = call.receive<PostRequestDto>()
             val model = PostModel(
                 id = input.id,
-                author = input.author,
-                content = input.content,
-                created = input.dateStamp,
+                author = input.author!!,
+                content = input.content!!,
+                date = input.date!!,
                 likedByMe = input.likedByMe,
                 likedCount = input.likedCount,
                 sharedByMe = input.sharedByMe,
                 sharedCount = input.sharedCount,
-                commentsByMe = input.commentsByMe,
-                commentsCount = input.commentsCount,
+                // commentsByMe = input.commentsByMe,
+                //commentsCount = input.commentsCount,
                 postType = input.postType,
                 dislikedCount = input.dislikedCount
             )
