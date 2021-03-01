@@ -22,7 +22,7 @@ data class PostResponseDto(
     var postType: PostType,
     var videoUrl: String? = null,
     var advUrl: String? = null,
-    var countViews: Int = 1
+    var countViews: Int = 0
 ) {
     companion object {
         fun fromModel(model: PostModel) = PostResponseDto(
