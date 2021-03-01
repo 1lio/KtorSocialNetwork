@@ -21,7 +21,8 @@ data class PostResponseDto(
     var repostCount: Int = 0,
     var postType: PostType,
     var videoUrl: String? = null,
-    var advUrl: String? = null
+    var advUrl: String? = null,
+    var countViews: Int = 1
 ) {
     companion object {
         fun fromModel(model: PostModel) = PostResponseDto(
@@ -41,6 +42,7 @@ data class PostResponseDto(
             postType = model.postType,
             videoUrl = model.videoUrl,
             advUrl = model.advUrl,
+            countViews = model.countViews
             // commentsByMe = model.commentsByMe,
             // commentsCount = model.commentsCount,
         )

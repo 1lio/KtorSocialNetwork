@@ -11,8 +11,9 @@ class PostRepositoryInMemoryImpl : PostRepository {
     override suspend fun getAll(): List<PostModel> {
 
         // ОБНОВЛЕНИЕ ПРОСМОТРОВ. Решение в лоб. Тут нужно подумать
-        items.forEach {
-            it.countViews++
+
+        items.forEachIndexed { index, postModel ->
+            items[index] = postModel.copy(countViews = postModel.countViews.inc())
         }
 
         return items
