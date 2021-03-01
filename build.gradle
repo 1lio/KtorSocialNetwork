@@ -12,7 +12,7 @@ application {
 }
 
 repositories {
-    jcenter()   // Данный репозиторий скоро будет закрыт. Многие либы уже переехали на mavenCentral
+    jcenter()       // Данный репозиторий скоро будет закрыт. Многие либы уже переехали на mavenCentral
     mavenCentral()
 }
 
@@ -21,9 +21,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation 'org.jetbrains.kotlinx:atomicfu:0.15.1'
 
-    // KTOR
-    implementation "io.ktor:ktor-server-cio:1.5.2"
-    implementation "io.ktor:ktor-gson:1.5.2"
+    // KTOR https://ktor.io/docs/welcome.html
+    implementation "io.ktor:ktor-server-cio:1.5.2" // Coroutine-based I/O Движок заточеный для работы с корутинами. Пока только http/1.x
+    implementation "io.ktor:ktor-gson:1.5.2"       // Json конвертер
 
     // Логирование
     implementation "ch.qos.logback:logback-classic:1.2.3"
