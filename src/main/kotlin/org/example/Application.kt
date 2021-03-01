@@ -67,4 +67,6 @@ fun Application.module() {
     install(Routing) {
         v1()
     }
+
+    println("Application is started")
 }
