@@ -36,22 +36,21 @@ fun Routing.v1() {
             call.respond(response)
         }
 
-
-
         post {
             val input = call.receive<PostRequestDto>()
             val model = PostModel(
                 id = input.id,
                 author = input.author,
                 content = input.content,
-                dateStamp = input.dateStamp,
+                created = input.dateStamp,
                 likedByMe = input.likedByMe,
                 likedCount = input.likedCount,
                 sharedByMe = input.sharedByMe,
                 sharedCount = input.sharedCount,
                 commentsByMe = input.commentsByMe,
                 commentsCount = input.commentsCount,
-                postType = input.postType
+                postType = input.postType,
+                dislikedCount = input.dislikedCount
             )
 
             val response = fromModel(repo.save(model))

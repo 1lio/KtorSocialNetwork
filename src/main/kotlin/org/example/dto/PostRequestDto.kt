@@ -7,8 +7,10 @@ data class PostRequestDto(
     var author: String,
     var content: String,
     var dateStamp: Long,
-    var likedByMe: Boolean,
+    var likedByMe: Int,
     var likedCount: Int,
+    var dislikedCount: Int,
+
     var sharedByMe: Boolean,
     var sharedCount: Int,
     var commentsByMe: Boolean,
@@ -17,7 +19,5 @@ data class PostRequestDto(
     var lat: Double? = null,
     var lng: Double? = null,
     var postType: PostType = PostType.POST,
-    var videoLink: String? = null,
-    var intentLink: String? = null,
-    var imageLink: Int? = null
+    var videoUrl: String? = null,
 )

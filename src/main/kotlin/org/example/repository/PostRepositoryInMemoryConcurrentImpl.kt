@@ -1,28 +1,24 @@
 package org.example.repository
 
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.example.model.PostModel
 import java.util.concurrent.CopyOnWriteArrayList
 
+
+// Паралельность
 class PostRepositoryInMemoryConcurrentImpl : PostRepository {
 
     // см. https://github.com/Kotlin/kotlinx.atomicfu#dos-and-donts
 
+    private val items = CopyOnWriteArrayList<PostModel>()
     private var nextId = atomic(0L)
 
-    // private val _nextId = atomic(0L)
-    // private var nextId by _nextId
-
-    private val items = CopyOnWriteArrayList<PostModel>()
-
-    // Возвращаем все элементы
-    // Правда я не понял зачем в обратном порядке
     override suspend fun getAll() = items.reversed()
 
-    // Возращаем по ID
     override suspend fun getById(id: Long): PostModel? = items.find { it.id == id }
 
-    // сохраняем и возвращаем...
     override suspend fun save(item: PostModel): PostModel =
         when (val index = items.indexOfFirst { it.id == item.id }) {
             -1 -> {
@@ -36,7 +32,6 @@ class PostRepositoryInMemoryConcurrentImpl : PostRepository {
             }
         }
 
-    // Удаляем по ID
     override suspend fun removeById(id: Long) {
         items.removeIf { it.id == id }
     }
@@ -59,9 +54,18 @@ class PostRepositoryInMemoryConcurrentImpl : PostRepository {
             -1 -> null
             else -> {
                 val item = items[index]
-                val copy = item.copy(likedCount = item.likedCount - 1) // copy = id -> id
+                val copy = item.copy(likedCount = item.dislikedCount + 1)
                 items[index] = copy
                 copy
+
             }
         }
+
+    override suspend fun repost(id: Long): PostModel? {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun share(id: Long): PostModel? {
+        TODO("Not yet implemented")
+    }
 }

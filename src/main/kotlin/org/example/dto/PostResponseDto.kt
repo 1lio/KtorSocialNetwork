@@ -7,8 +7,8 @@ data class PostResponseDto(
     var id: Long,
     var author: String,
     var content: String,
-    var dateStamp: Long,
-    var likedByMe: Boolean,
+    var created: Long,
+    var likedByMe: Int,
     var likedCount: Int,
     var sharedByMe: Boolean,
     var sharedCount: Int,
@@ -18,16 +18,14 @@ data class PostResponseDto(
     var lat: Double? = null,
     var lng: Double? = null,
     var postType: PostType,
-    var videoLink: String? = null,
-    var intentLink: String? = null,
-    var imageLink: Int? = null
+    var videoUrl: String? = null,
 ) {
     companion object {
         fun fromModel(model: PostModel) = PostResponseDto(
             id = model.id,
             author = model.author,
             content = model.content,
-            dateStamp = model.dateStamp,
+            created = model.created,
             likedByMe = model.likedByMe,
             likedCount = model.likedCount,
             sharedByMe = model.sharedByMe,
@@ -38,9 +36,7 @@ data class PostResponseDto(
             lat = model.lat,
             lng = model.lng,
             postType = model.postType,
-            videoLink = model.videoLink,
-            intentLink = model.intentLink,
-            imageLink = model.imageLink
+            videoUrl = model.videoUrl
         )
     }
 }

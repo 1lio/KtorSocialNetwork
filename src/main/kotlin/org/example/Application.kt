@@ -4,10 +4,7 @@ import io.ktor.application.Application
 import io.ktor.application.call
 import io.ktor.server.cio.EngineMain
 import io.ktor.application.install
-import io.ktor.features.ContentNegotiation
-import io.ktor.features.NotFoundException
-import io.ktor.features.ParameterConversionException
-import io.ktor.features.StatusPages
+import io.ktor.features.*
 import io.ktor.gson.gson
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
@@ -24,6 +21,9 @@ fun main(args: Array<String>): Unit = EngineMain.main(args) // Движок от
 // Тут конфигурируется наш сервер. Для конфигурации Ktor использует фичи.
 fun Application.module() {
 
+    // Включаем логирование
+    install(CallLogging)
+
     // Механизм, позволяющий автоматически преобразовывать контент
     install(ContentNegotiation) {
         gson {
@@ -38,16 +38,21 @@ fun Application.module() {
             call.respond(HttpStatusCode.NotImplemented)
             throw it
         }
-        exception<ParameterConversionException> {
-            call.respond(HttpStatusCode.BadRequest)
-            throw it
-        }
+
         exception<Throwable> {
             call.respond(HttpStatusCode.InternalServerError)
             throw it
         }
+
+        // NotFoundException (ошибка 404)
         exception<NotFoundException> {
             call.respond(HttpStatusCode.NotFound)
+            throw it
+        }
+
+        // ParameterConversionException (ошибка 400)
+        exception<ParameterConversionException> {
+            call.respond(HttpStatusCode.BadRequest)
             throw it
         }
     }

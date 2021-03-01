@@ -2,21 +2,27 @@ package org.example.repository
 
 import org.example.model.PostModel
 
+// В лоб в памяти
 class PostRepositoryInMemoryImpl : PostRepository {
-    private var nextId = 1L
-    private val items = mutableListOf<PostModel>()
+
+    private val items = mutableListOf<PostModel>()      // Список с постами
+    private var nextId = 1L                             // Индификатор след ID. Не понял для чего он, но путь остается
 
     override suspend fun getAll(): List<PostModel> {
-        return items.reversed()
+
+        // ОБНОВЛЕНИЕ ПРОСМОТРОВ. Решение в лоб. Тут нужно подумать
+        items.forEach {
+            it.countViews++
+        }
+
+        return items
     }
 
-    override suspend fun getById(id: Long): PostModel? {
-        return items.find { it.id == id }
-    }
+    override suspend fun getById(id: Long): PostModel? = items.find { it.id == id }
 
     // id = 0 - создание, id != 0 - обновление
-    override suspend fun save(item: PostModel): PostModel {
-        return when (val index = items.indexOfFirst { it.id == item.id }) {
+    override suspend fun save(item: PostModel): PostModel =
+        when (val index = items.indexOfFirst { it.id == item.id }) {
             -1 -> {
                 val copy = item.copy(id = nextId++)
                 items.add(copy)
@@ -27,17 +33,46 @@ class PostRepositoryInMemoryImpl : PostRepository {
                 item
             }
         }
-    }
 
     override suspend fun removeById(id: Long) {
         items.removeIf { it.id == id }
     }
 
-    override suspend fun likeById(id: Long): PostModel? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun likeById(id: Long): PostModel? =
+        when (val index = items.indexOfFirst { it.id == id }) {
+            -1 -> null
+            else -> {
+                val item = items[index]
+                val copy = item.copy(
+
+                    // Чекаем лайки
+                    likedCount = item.likedCount + 1,
+                    likedByMe = if (item.likedByMe < 1) 1 else 0
+                )
+                items[index] = copy
+                copy
+            }
+        }
+
+    override suspend fun dislikeById(id: Long): PostModel? =
+        when (val index = items.indexOfFirst { it.id == id }) {
+            -1 -> null
+            else -> {
+                val item = items[index]
+                val copy = item.copy(
+                    likedCount = item.likedCount - 1,
+                    likedByMe = if (item.likedByMe > 0) -1 else 0
+                )
+                items[index] = copy
+                copy
+            }
+        }
+
+    override suspend fun repost(id: Long): PostModel? {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun dislikeById(id: Long): PostModel? {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun share(id: Long): PostModel? {
+        TODO("Not yet implemented")
     }
 }
