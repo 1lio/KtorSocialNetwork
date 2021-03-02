@@ -1,50 +1,53 @@
 package org.example.dto
 
-import org.example.model.PostModel
-import org.example.model.PostType
+import org.example.model.*
 
 data class PostResponseDto(
-    var id: Long,
-    var author: String,
-    var content: String,
-    var created: Long,
-    var likedByMe: Int,
-    var likedCount: Int,
-    var sharedByMe: Boolean,
-    var sharedCount: Int,
-    // var commentsByMe: Boolean,
-    // var commentsCount: Int,
-    var address: String? = null,
-    var lat: Double? = null,
-    var lng: Double? = null,
-    var repostByMe: Boolean = false,
-    var repostCount: Int = 0,
-    var postType: PostType,
-    var videoUrl: String? = null,
-    var advUrl: String? = null,
-    var countViews: Int = 0
+    val id: Long,
+    val author: String,
+    val content: String,
+    val created: Long,
+    val location: Location,
+    val likedCount: Int,
+    val dislikedCount: Int,
+    val likedByMe: Int,
+    val commentsCount: Int,
+    val commentsByMe: Boolean,
+    val comments: List<Comment>?,
+    val repostByMe: Boolean,
+    val repostCount: Int,
+    val sharedByMe: Boolean,
+    val sharedCount: Int,
+    val video: Video?,
+    val adv: Adv?,
+    val isHidden: Boolean,
+    val countViews: Long,
+    val postType: PostType
 ) {
     companion object {
+
+        // В ответе мы отдаем модель как есть.
         fun fromModel(model: PostModel) = PostResponseDto(
             id = model.id,
             author = model.author,
             content = model.content,
-            created = model.date,
-            likedByMe = model.likedByMe,
+            created = model.created,
+            location = model.location,
             likedCount = model.likedCount,
-            sharedByMe = model.sharedByMe,
-            sharedCount = model.sharedCount,
+            dislikedCount = model.dislikedCount,
+            likedByMe = model.likedByMe,
+            commentsCount = model.commentsCount,
+            commentsByMe = model.commentsByMe,
+            comments = model.comments,
             repostByMe = model.repostByMe,
             repostCount = model.repostCount,
-            address = model.address,
-            lat = model.lat,
-            lng = model.lng,
-            postType = model.postType,
-            videoUrl = model.videoUrl,
-            advUrl = model.advUrl,
-            countViews = model.countViews
-            // commentsByMe = model.commentsByMe,
-            // commentsCount = model.commentsCount,
+            sharedByMe = model.sharedByMe,
+            sharedCount = model.sharedCount,
+            video = model.video,
+            adv = model.adv,
+            isHidden = model.isHidden,
+            countViews = model.countViews,
+            postType = model.postType
         )
     }
 }

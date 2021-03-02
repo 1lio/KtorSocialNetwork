@@ -25,12 +25,15 @@ dependencies {
     implementation "io.ktor:ktor-server-cio:1.5.2" // Coroutine-based I/O Движок заточеный для работы с корутинами. Пока только http/1.x
     implementation "io.ktor:ktor-gson:1.5.2"       // Json конвертер
 
-    // Логирование
-    implementation "ch.qos.logback:logback-classic:1.2.3"
+    // Mongodb
+    implementation "org.litote.kmongo:kmongo-coroutine:4.2.4" // С корутинами
 
     // Kodein https://github.com/Kodein-Framework/Kodein-DI
     implementation 'org.kodein.di:kodein-di-generic-jvm:6.3.3'
     implementation 'org.kodein.di:kodein-di-framework-ktor-server-jvm:6.3.3'
+
+    // Логирование
+    implementation "ch.qos.logback:logback-classic:1.2.3"
 
     testImplementation "io.ktor:ktor-server-tests:1.5.2"
 }

@@ -2,19 +2,24 @@ package org.example.route
 
 import io.ktor.application.*
 import io.ktor.features.*
+import io.ktor.http.content.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import org.example.dto.PostRequestDto
 import org.example.dto.PostResponseDto.Companion.fromModel
 import org.example.model.PostModel
+import org.example.model.PostType
 import org.example.repository.PostRepository
 import org.kodein.di.generic.instance
 import org.kodein.di.ktor.kodein
 
+const val BASE_URL = "/api/v1"
+
 fun Routing.v1() {
 
-    route("/api/v1/posts") {
+    // REST
+    route("$BASE_URL/posts") {
 
         val repo by kodein().instance<PostRepository>()
 
@@ -65,15 +70,16 @@ fun Routing.v1() {
                 id = input.id,
                 author = input.author!!,
                 content = input.content!!,
-                date = input.date!!,
-                likedByMe = input.likedByMe,
-                likedCount = input.likedCount,
-                sharedByMe = input.sharedByMe,
-                sharedCount = input.sharedCount,
+                created = input.created!!,
+                location = input.location!!,
+                //  likedByMe = input.,
+                // likedCount = input.likedCount,
+                // sharedByMe = input.sharedByMe,
+                //  sharedCount = input.sharedCount,
                 // commentsByMe = input.commentsByMe,
                 //commentsCount = input.commentsCount,
-                postType = input.postType,
-                dislikedCount = input.dislikedCount
+                postType = input.postType ?: PostType.POST,
+                //  dislikedCount = input.dislikedCount
             )
 
             val response = fromModel(repo.save(model))
@@ -86,4 +92,10 @@ fun Routing.v1() {
         }
 
     }
+
+    // Статический контент
+    static("$BASE_URL/static") {
+        //  files(staticPath)
+    }
+
 }

@@ -1,20 +1,19 @@
 package org.example
 
-import io.ktor.application.Application
-import io.ktor.application.call
-import io.ktor.server.cio.EngineMain
-import io.ktor.application.install
+import io.ktor.application.*
 import io.ktor.features.*
-import io.ktor.gson.gson
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
-import io.ktor.routing.Routing
+import io.ktor.gson.*
+import io.ktor.http.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.cio.*
 import org.example.repository.PostRepository
-import org.example.repository.PostRepositoryInMemoryImpl
-import org.example.route.v1
+import org.example.repository.PostRepositoryInMemoryWithMutexImpl
 import org.kodein.di.generic.bind
-import org.kodein.di.generic.singleton
+import org.kodein.di.generic.eagerSingleton
+import org.kodein.di.generic.with
 import org.kodein.di.ktor.KodeinFeature
+import javax.naming.ConfigurationException
 
 fun main(args: Array<String>): Unit = EngineMain.main(args) // Движок отчечающий за работу
 
@@ -59,14 +58,26 @@ fun Application.module() {
 
     // Внедряем DI
     install(KodeinFeature) {
+
+        // Предоставлемые констаны Kodein-ом
+        constant(tag = "upload-dir") with (
+                environment.config.propertyOrNull("ncrafr.upload.dir")?.getString()
+                    ?: throw ConfigurationException("Upload dir is not specified")
+                )
+
         // В блок лямбды подкладываем реализацию
-        bind<PostRepository>() with singleton { PostRepositoryInMemoryImpl() }
+        bind<PostRepository>() with eagerSingleton { PostRepositoryInMemoryWithMutexImpl() }
+
+        //bind<RoutingV1>() with eagerSingleton { RoutingV1(instance(tag = "upload-dir")) }
     }
 
     // Подключаем Routing
     install(Routing) {
-        v1()
+       // val routingV1 by kodein().instance<RoutingV1>()
+       // routingV1.setup(this)
     }
+
+
 
     println("Application is started")
 }
