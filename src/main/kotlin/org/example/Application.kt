@@ -10,7 +10,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.response.respond
 import io.ktor.routing.Routing
 import org.example.repository.PostRepository
-import org.example.repository.PostRepositoryInMemoryImpl
 import org.example.repository.PostRepositoryInMemoryWithMutexImpl
 import org.example.route.v1
 import org.kodein.di.generic.bind
