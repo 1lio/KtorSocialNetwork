@@ -14,7 +14,9 @@ import org.example.repository.PostRepositoryInMemoryWithMutexImpl
 import org.example.route.v1
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.singleton
+import org.kodein.di.generic.with
 import org.kodein.di.ktor.KodeinFeature
+import javax.naming.ConfigurationException
 
 fun main(args: Array<String>): Unit = EngineMain.main(args) // Движок отчечающий за работу
 
@@ -59,6 +61,9 @@ fun Application.module() {
 
     // Внедряем DI
     install(KodeinFeature) {
+        constant(tag = "upload-dir") with (environment.config.propertyOrNull("ncraft.upload.dir")?.getString()
+            ?: throw  ConfigurationException("Upload dir is not specified"))
+
         // В блок лямбды подкладываем реализацию
         bind<PostRepository>() with singleton { PostRepositoryInMemoryWithMutexImpl() }
     }

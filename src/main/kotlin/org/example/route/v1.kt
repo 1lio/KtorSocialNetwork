@@ -12,9 +12,11 @@ import org.example.repository.PostRepository
 import org.kodein.di.generic.instance
 import org.kodein.di.ktor.kodein
 
+const val API = "/api/v1/"
+
 fun Routing.v1() {
 
-    route("/api/v1/posts") {
+    route("$API/posts") {
 
         val repo by kodein().instance<PostRepository>()
 
