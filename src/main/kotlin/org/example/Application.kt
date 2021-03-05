@@ -8,7 +8,8 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.cio.*
 import org.example.repository.PostRepository
-import org.example.repository.PostRepositoryInMemoryWithMutexImpl
+import org.example.repository.PostRepositoryInMongodb
+import org.example.route.v1
 import org.kodein.di.generic.bind
 import org.kodein.di.generic.eagerSingleton
 import org.kodein.di.generic.with
@@ -60,21 +61,22 @@ fun Application.module() {
     install(KodeinFeature) {
 
         // Предоставлемые констаны Kodein-ом
-        constant(tag = "upload-dir") with (
+   /*     constant(tag = "upload-dir") with (
                 environment.config.propertyOrNull("ncrafr.upload.dir")?.getString()
                     ?: throw ConfigurationException("Upload dir is not specified")
-                )
+                )*/
 
         // В блок лямбды подкладываем реализацию
-        bind<PostRepository>() with eagerSingleton { PostRepositoryInMemoryWithMutexImpl() }
+        bind<PostRepository>() with eagerSingleton { PostRepositoryInMongodb() }
 
         //bind<RoutingV1>() with eagerSingleton { RoutingV1(instance(tag = "upload-dir")) }
     }
 
     // Подключаем Routing
     install(Routing) {
-       // val routingV1 by kodein().instance<RoutingV1>()
-       // routingV1.setup(this)
+        v1()
+        // val routingV1 by kodein().instance<RoutingV1>()
+        // routingV1.setup(this)
     }
 
 
