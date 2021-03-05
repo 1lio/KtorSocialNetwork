@@ -34,7 +34,7 @@ data class PostModel(
     var videoUrl: String? = null,
     var advUrl: String? = null,
 
-    var countViews: Int = 1,
+    var countViews: Int = 0,
     var postType: PostType = PostType.POST
 )
 
