@@ -27,10 +27,12 @@ class FileService(private val uploadPath: String) {
     suspend fun save(multipart: MultiPartData): AttachmentResponseDto {
 
         var response: AttachmentResponseDto? = null
+
         multipart.forEachPart { part ->
             when (part) {
-
                 is PartData.FileItem -> {
+
+                    // use Apache Tika for content detection
                     if (!images.contains(part.contentType)) {
                         throw UnsupportedMediaTypeException(part.contentType ?: ContentType.Any)
                     }
