@@ -32,6 +32,15 @@ dependencies {
     implementation 'org.kodein.di:kodein-di-generic-jvm:6.3.3'
     implementation 'org.kodein.di:kodein-di-framework-ktor-server-jvm:6.3.3'
 
+    // Auth
+    implementation "io.ktor:ktor-auth:1.2.4"
+    implementation "io.ktor:ktor-auth-jwt:1.2.4"
+
+    compile group: 'org.springframework.security', name: 'spring-security-crypto', version: '5.3.2.RELEASE'
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '0.8.0'
+    compile 'org.slf4j:jcl-over-slf4j:1.7.12'
+    compile 'org.springframework:spring-webmvc:4.1.6.RELEASE'
+
     testImplementation "io.ktor:ktor-server-tests:1.5.2"
 }
 
