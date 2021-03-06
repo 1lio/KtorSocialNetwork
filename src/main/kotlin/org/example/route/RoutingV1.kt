@@ -10,25 +10,23 @@ import io.ktor.routing.*
 import org.example.dto.request.*
 import org.example.dto.responce.UserResponseDto
 import org.example.model.UserModel
+import org.example.repository.PostRepository
 import org.example.service.FileService
 import org.example.service.PostService
 import org.example.service.UserService
 
 class RoutingV1(
     private val staticPath: String,
+    private val repo: PostRepository,
     private val fileService: FileService,
     private val userService: UserService,
     private val postService: PostService
 ) {
 
-    companion object {
-        const val API_PATH = "/api/v1/"
-    }
-
     fun setup(configuration: Routing) {
         with(configuration) {
 
-            route(API_PATH) {
+            route("/api/v1/") {
                 static("/static") {
                     files(staticPath)
                 }

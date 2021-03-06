@@ -71,10 +71,12 @@ fun Application.module() {
 
     // Внедряем DI
     install(KodeinFeature) {
+        // ТУТ падает
         constant(tag = "upload-dir") with (
                 environment.config.propertyOrNull("ncraft.upload.dir")?.getString()
                     ?: throw ConfigurationException("Upload dir is not specified")
                 )
+
         bind<PostRepository>() with singleton {
             PostRepositoryInMemoryWithMutexImpl()
         }
@@ -90,7 +92,7 @@ fun Application.module() {
                 passwordEncoder = instance()
             ).apply {
                 runBlocking {
-                    saveNewModel(username = "Dmitriy", password = "qwerty")
+                    saveNewModel(username = "Test", password = "qwerty")
                 }
             }
         }
@@ -101,7 +103,7 @@ fun Application.module() {
         bind<RoutingV1>() with eagerSingleton {
             RoutingV1(
                 staticPath = instance(tag = "upload-dir"),
-                //repo = instance(),
+                repo = instance(),
                 fileService = instance(),
                 userService = instance(),
                 postService = instance()
