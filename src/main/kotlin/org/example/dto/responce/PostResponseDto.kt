@@ -1,4 +1,4 @@
-package org.example.dto
+package org.example.dto.responce
 
 import org.example.model.PostModel
 import org.example.model.PostType

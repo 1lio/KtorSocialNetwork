@@ -35,9 +35,12 @@ data class PostModel(
     var advUrl: String? = null,
 
     var countViews: Int = 0,
-    var postType: PostType = PostType.POST
-)
+    var postType: PostType = PostType.POST,
 
-enum class PostType {
-    POST, REPOST, EVENT, VIDEO, ADV
-}
+
+///tmp
+    val source: PostModel? = null,
+    val location: Location? = null,
+    val link: String? = null,
+    val attachment: AttachmentModel? = null
+)
