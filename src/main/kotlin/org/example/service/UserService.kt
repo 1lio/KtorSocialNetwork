@@ -43,12 +43,14 @@ class UserService(
         if (!passwordEncoder.matches(input.password, model.password)) {
             throw PasswordChangeException("Wrong password!")
         }
+
         val token = tokenService.generate(model.id)
         return AuthenticationResponseDto(token)
     }
 
     suspend fun saveNewModel(username: String, password: String): UserModel {
         val model = UserModel(username = username, password = passwordEncoder.encode(password))
+        println("User $username is saved!")
         return repo.save(model)
     }
 
