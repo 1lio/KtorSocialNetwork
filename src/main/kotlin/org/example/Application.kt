@@ -71,11 +71,8 @@ fun Application.module() {
 
     // Внедряем DI
     install(KodeinFeature) {
-        // ТУТ падает
-        constant(tag = "upload-dir") with (
-                environment.config.propertyOrNull("ncraft.upload.dir")?.getString()
-                    ?: throw ConfigurationException("Upload dir is not specified")
-                )
+        constant(tag = "upload-dir") with (environment.config.propertyOrNull("user.upload.dir")?.getString()
+            ?: throw ConfigurationException("Upload dir is not specified"))
 
         bind<PostRepository>() with singleton {
             PostRepositoryInMemoryWithMutexImpl()
