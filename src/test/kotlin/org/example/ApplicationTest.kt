@@ -67,7 +67,7 @@ class ApplicationTest {
     private val uploadPath = Files.createTempDirectory("test").toString()
     private val configure: Application.() -> Unit = {
         (environment.config as MapApplicationConfig).apply {
-            put("ncraft.upload.dir", uploadPath)
+            put("user.upload.dir", uploadPath)
         }
         module()
     }
@@ -134,7 +134,7 @@ class ApplicationTest {
                                 ).toString(),
                                 ContentDisposition.File.withParameter(
                                     ContentDisposition.Parameters.FileName,
-                                    "photo.jpg"
+                                    "test.jpg"
                                 ).toString()
                             ),
                             HttpHeaders.ContentType to listOf(ContentType.Image.JPEG.toString())
