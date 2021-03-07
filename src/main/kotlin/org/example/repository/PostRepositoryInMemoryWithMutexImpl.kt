@@ -124,4 +124,41 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
             }
         }
     }
+
+    override suspend fun getRecent(): List<PostModel> {
+        try {
+            if (items.isEmpty()) {
+                return emptyList()
+            }
+            return getAll().slice(0..4)
+        } catch (e: IndexOutOfBoundsException) {
+            return getAll()
+        }
+    }
+
+    override suspend fun getPostsAfter(id: Long): List<PostModel>? {
+        val item = getById(id)
+        val itemsReversed = getAll()
+        return when (val index = itemsReversed.indexOfFirst { it.id == item?.id }) {
+            -1 -> null
+            0 -> emptyList()
+            else -> itemsReversed.slice(0 until index)
+        }
+    }
+
+    override suspend fun getPostsBefore(id: Long): List<PostModel>? {
+        val item = getById(id)
+        val itemsReversed = getAll()
+        return when (val index = itemsReversed.indexOfFirst { it.id == item?.id }) {
+            -1-> null
+            (items.size - 1) -> emptyList()
+            else -> {
+                try {
+                    itemsReversed.slice((index + 1)..(index + 5))
+                } catch (e: IndexOutOfBoundsException) {
+                    itemsReversed.slice((index + 1) until items.size)
+                }
+            }
+        }
+    }
 }
