@@ -9,22 +9,22 @@ data class PostModel(
     val imageUrl: String?,               // Прикрепленное изображение
 
     // Likes
-    var likedCount: Int = 0,
-    var dislikedCount: Int = 0,
-    var likedByMe: Int = 0,             // 1 like, -1 dislike, 0 nothing
+    val likedCount: Int = 0,
+    val dislikedCount: Int = 0,
+    val likedByMe: Int = 0,             // 1 like, -1 dislike, 0 nothing
 
     // Reposts
-    var repostCount: Int = 0,
-    var repostByMe: Boolean = false,
+    val repostCount: Int = 0,
+    val repostByMe: Boolean = false,
 
     // Share
-    var sharedCount: Int = 0,
-    var sharedByMe: Boolean = false,
+    val sharedCount: Int = 0,
+    val sharedByMe: Boolean = false,
 
     // Прочие события
     val event: EventModel? = null,       // Событие подразумевает адрес и координаты
     val video: VideoModel? = null,       // Видеоконтент
 
-    var postType: PostType = PostType.POST,
-    var countViews: Int = 0,
+    val postType: PostType = PostType.POST,
+    val countViews: Int = 0,
 )

@@ -1,6 +1,7 @@
 package org.example.repository
 
 import io.ktor.features.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.example.model.PostModel
@@ -28,16 +29,13 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
 
         val item = items.find { it.id == id } ?: throw NotFoundException()
 
-        // Сохраняем
+        // Увеличиваем счетчик.
         val index = items.indexOfFirst { it.id == item.id }
-        items[index] = item.apply {
-            countViews++
-        }
+        items[index] = item.copy(
+            countViews = items[index].countViews + 1
+        )
 
-        // Так не получается из-за блокирующей функции
-        // save(item.apply { countViews++ })
-
-        return item
+        return items[index]
     }
 
     override suspend fun save(item: PostModel): PostModel = mutex.withLock {
@@ -69,11 +67,11 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
                 var countLike = item.likedCount
 
                 val copyItem = item.copy(
-                    dislikedCount = if(item.likedByMe < 1) item.dislikedCount++ else item.dislikedCount,
+                    dislikedCount = if (item.likedByMe < 1) item.dislikedCount.inc() else item.dislikedCount,
                     likedByMe = if (item.likedByMe < 1) 1 else 0,
                     likedCount = if (item.likedByMe < 1) ++countLike else --countLike,
 
-                )
+                    )
                 items[index] = copyItem
                 copyItem
             }
@@ -86,7 +84,7 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
             else -> {
                 val item = items[index]
                 val copyItem = item.copy(
-                    dislikedCount = if (item.likedByMe >= 0) item.dislikedCount++ else item.dislikedCount--,
+                    dislikedCount = if (item.likedByMe >= 0) item.dislikedCount.inc() else item.dislikedCount.dec(),
                     likedByMe = if (item.likedByMe >= 0) -1 else 0
                 )
                 items[index] = copyItem
@@ -102,7 +100,7 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
                 val item = items[index]
                 val copyItem = item.copy(
                     repostByMe = true,
-                    repostCount = item.repostCount++
+                    repostCount = item.repostCount.inc()
                 )
                 items[index] = copyItem
                 copyItem
@@ -117,7 +115,7 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
                 val item = items[index]
                 val copyItem = item.copy(
                     sharedByMe = true,
-                    sharedCount = item.repostCount++
+                    sharedCount = item.repostCount.inc()
                 )
                 items[index] = copyItem
                 copyItem
@@ -150,7 +148,7 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
         val item = getById(id)
         val itemsReversed = getAll()
         return when (val index = itemsReversed.indexOfFirst { it.id == item.id }) {
-            -1-> null
+            -1 -> null
             (items.size - 1) -> emptyList()
             else -> {
                 try {
