@@ -86,7 +86,7 @@ fun Application.module() {
         bind<UserRepository>() with eagerSingleton { UserRepositoryInMemoryWithMutexImpl() }
 
         // Services
-        bind<PostService>() with eagerSingleton { PostService(repo = instance()) }
+        bind<PostService>() with eagerSingleton { PostService(postRepo = instance(),userRepo = instance() ) }
         bind<FileService>() with eagerSingleton { FileService(uploadPath = instance(UPLOAD_DIR)) }
         bind<UserService>() with eagerSingleton {
             UserService(

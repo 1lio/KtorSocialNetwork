@@ -48,4 +48,24 @@ class UserRepositoryInMemoryWithMutexImpl : UserRepository {
                 }
             }
         }
+
+    override suspend fun updateUserPosts(listLikes: List<Long>): UserModel {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateUserReposts(listLikes: List<Long>): UserModel {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateLikes(listLikes: List<Long>): UserModel {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateDislikes(listLikes: List<Long>): UserModel {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun updateShared(listLikes: List<Long>): UserModel {
+        TODO("Not yet implemented")
+    }
 }
