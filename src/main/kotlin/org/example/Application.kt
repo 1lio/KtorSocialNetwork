@@ -28,7 +28,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import javax.naming.ConfigurationException
 
-fun main(args: Array<String>): Unit = EngineMain.main(args) // Движок отчечающий за работу
+private const val UPLOAD_DIR = "user.upload.dir"
+
+fun main(args: Array<String>): Unit = EngineMain.main(args) // Старт движка отчечающего за работу
 
 // Тут конфигурируется наш сервер. Для конфигурации Ktor использует фичи.
 fun Application.module() {
@@ -71,36 +73,38 @@ fun Application.module() {
 
     // Внедряем DI
     install(KodeinFeature) {
-        constant(tag = "upload-dir") with (environment.config.propertyOrNull("user.upload.dir")?.getString()
+
+        // Kodein позволяет предоставлять константы для DI след образом
+        constant(UPLOAD_DIR) with (environment.config.propertyOrNull(UPLOAD_DIR)?.getString()
             ?: throw ConfigurationException("Upload dir is not specified"))
 
-        bind<PostRepository>() with singleton {
-            PostRepositoryInMemoryWithMutexImpl()
-        }
+        // Repository
+        bind<PostRepository>() with singleton { PostRepositoryInMemoryWithMutexImpl() }
 
+        // eagerSingleton позволяет инстанциировать объект"не лениво", а
+        // сразу при старте. Таким образом, мы упадём, если что-то пойдёт не так.
         bind<UserRepository>() with eagerSingleton { UserRepositoryInMemoryWithMutexImpl() }
 
-        bind<PostService>() with eagerSingleton { PostService(instance()) }
-        bind<FileService>() with eagerSingleton { FileService(instance(tag = "upload-dir")) }
+        // Services
+        bind<PostService>() with eagerSingleton { PostService(repo = instance()) }
+        bind<FileService>() with eagerSingleton { FileService(uploadPath = instance(UPLOAD_DIR)) }
         bind<UserService>() with eagerSingleton {
             UserService(
                 repo = instance(),
                 tokenService = instance(),
                 passwordEncoder = instance()
-            ).apply {
-                runBlocking {
-                    saveNewModel(username = "Test", password = "qwerty")
-                }
-            }
+            ).apply { addTestUser() }
         }
-        bind<JWTTokenService>() with eagerSingleton { JWTTokenService() }
 
+        // Encoder
+        bind<JWTTokenService>() with eagerSingleton { JWTTokenService() }
         bind<PasswordEncoder>() with eagerSingleton { BCryptPasswordEncoder() }
 
+        // Вместо instance Kodein подставит объект нужного типа. Это позволит легко сделать независимыми компоненты
+        // от Kodein (они, фактически, ничего ни о каком DI не знают)
         bind<RoutingV1>() with eagerSingleton {
             RoutingV1(
-                staticPath = instance(tag = "upload-dir"),
-                repo = instance(),
+                staticPath = instance(UPLOAD_DIR),
                 fileService = instance(),
                 userService = instance(),
                 postService = instance()
@@ -108,12 +112,17 @@ fun Application.module() {
         }
     }
 
+    // Механизм авторизации
     install(Authentication) {
         jwt {
+            // Получаем инстансы сервисов
             val jwtService by kodein().instance<JWTTokenService>()
-            verifier(jwtService.verifier)
             val userService by kodein().instance<UserService>()
 
+            // Проверяем формат и подпись токена
+            verifier(jwtService.verifier)
+
+            // Валидируем пользователя. Чекаем ID
             validate {
                 val id = it.payload.getClaim("id").asLong()
                 userService.getModelById(id)
@@ -121,9 +130,17 @@ fun Application.module() {
         }
     }
 
+    // Роутинг | дерево URL
     install(Routing) {
-
         val routingV1 by kodein().instance<RoutingV1>()
         routingV1.setup(this)
+    }
+
+}
+
+// Создаем пользователя для проверки
+private fun UserService.addTestUser() {
+    runBlocking {
+        saveNewModel(username = "Test", password = "qwerty")
     }
 }
