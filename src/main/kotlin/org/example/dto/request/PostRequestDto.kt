@@ -1,45 +1,44 @@
 package org.example.dto.request
 
-import org.example.model.Location
+import org.example.model.EventModel
 import org.example.model.PostModel
 import org.example.model.PostType
+import org.example.model.VideoModel
 
 data class PostRequestDto(
     val id: Long,
-    val author: String,
+    val authorId: Long,
     val content: String,
     val created: Long,
-    val likedByMe: Boolean = false,
-    val countLikes: Int = 10,
-    val commentedByMe: Boolean = false,
-    val countComments: Int = 0,
-    val sharedByMe: Boolean = false,
-    val countShares: Int = 0,
-    val videoUrl: String? = null,
-    val type: PostType = PostType.POST,
-    val source: PostModel? = null,
-    val address: String? = null,
-    val location: Location? = null,
-    val link: String? = null
+    val imageUrl: String,
+    var likedCount: Int = 0,
+    var dislikedCount: Int = 0,
+    var likedByMe: Int = 0,             // 1 like, -1 dislike, 0 nothing
+    var repostCount: Int = 0,
+    var repostByMe: Boolean = false,
+    var sharedCount: Int = 0,
+    var sharedByMe: Boolean = false,
+    val event: EventModel? = null,       // Событие подразумевает адрес и координаты
+    val video: VideoModel? = null,       // Видеоконтент
+    var postType: PostType = PostType.POST,
+    var countViews: Int = 0,
 ) {
     companion object {
         fun toModel(dto: PostRequestDto) = PostModel(
             id = dto.id,
-            author = dto.author,
+            authorId = dto.authorId,
             content = dto.content,
-            date = dto.created,
-            likedByMe = if(dto.likedByMe) 1 else 0,
-            likedCount = dto.countLikes,
-            // commentedByMe = dto.commentedByMe,
-            //  countComments = dto.countComments,
+            imageUrl = dto.imageUrl,
+            created = dto.created,
+            likedCount = dto.likedCount,
+            dislikedCount = dto.dislikedCount,
+            likedByMe = dto.likedByMe,
+            sharedCount = dto.sharedCount,
             sharedByMe = dto.sharedByMe,
-            sharedCount = dto.countShares,
-            videoUrl = dto.videoUrl,
-            postType = dto.type,
-            source = dto.source,
-            address = dto.address,
-            location = dto.location,
-            link = dto.link
+            event = dto.event,
+            video = dto.video,
+            postType = dto.postType,
+            countViews = dto.countViews
         )
     }
 }

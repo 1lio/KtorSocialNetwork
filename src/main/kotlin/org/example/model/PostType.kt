@@ -1,5 +1,6 @@
 package org.example.model
 
+// Типы постов
 enum class PostType {
-    POST, REPOST, EVENT, VIDEO, ADV
+    POST, REPOST, EVENT, VIDEO, MULTI
 }

@@ -18,13 +18,12 @@ class UserService(
     private val tokenService: JWTTokenService,
     private val passwordEncoder: PasswordEncoder
 ) {
-    suspend fun getModelById(id: Long): UserModel? {
-        return repo.getById(id)
-    }
+
+    suspend fun getModelById(id: Long): UserModel = repo.getById(id) ?: throw  NotFoundException()
 
     suspend fun getById(id: Long): UserResponseDto {
-        val model = repo.getById(id) ?: throw NotFoundException()
-        return UserResponseDto.fromModel(model)
+        val model = repo.getById(id)
+        return UserResponseDto.fromModel(model!!)
     }
 
     suspend fun changePassword(id: Long, input: PasswordChangeRequestDto) {
@@ -55,12 +54,12 @@ class UserService(
     }
 
     suspend fun register(input: RegistrationRequestDto): RegistrationResponseDto {
+
         if (repo.getByUsername(input.username) != null) {
             throw RegistrationException()
         }
 
         val model = saveNewModel(input.username, input.password)
-
         val token = tokenService.generate(model.id)
         return RegistrationResponseDto(token)
     }

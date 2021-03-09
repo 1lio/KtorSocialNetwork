@@ -1,50 +1,44 @@
 package org.example.dto.responce
 
+import org.example.model.EventModel
 import org.example.model.PostModel
 import org.example.model.PostType
+import org.example.model.VideoModel
 
 data class PostResponseDto(
-    var id: Long,
-    var author: String,
-    var content: String,
-    var created: Long,
-    var likedByMe: Int,
-    var likedCount: Int,
-    var sharedByMe: Boolean,
-    var sharedCount: Int,
-    // var commentsByMe: Boolean,
-    // var commentsCount: Int,
-    var address: String? = null,
-    var lat: Double? = null,
-    var lng: Double? = null,
-    var repostByMe: Boolean = false,
+    val id: Long,
+    val authorId: Long,
+    val content: String,
+    val created: Long,
+    val imageUrl: String,
+    var likedCount: Int = 0,
+    var dislikedCount: Int = 0,
+    var likedByMe: Int = 0,
     var repostCount: Int = 0,
-    var postType: PostType,
-    var videoUrl: String? = null,
-    var advUrl: String? = null,
-    var countViews: Int = 0
+    var repostByMe: Boolean = false,
+    var sharedCount: Int = 0,
+    var sharedByMe: Boolean = false,
+    val event: EventModel? = null,
+    val video: VideoModel? = null,
+    var postType: PostType = PostType.POST,
+    var countViews: Int,
 ) {
     companion object {
-        fun fromModel(model: PostModel) = PostResponseDto(
-            id = model.id,
-            author = model.author,
-            content = model.content,
-            created = model.date,
-            likedByMe = model.likedByMe,
-            likedCount = model.likedCount,
-            sharedByMe = model.sharedByMe,
-            sharedCount = model.sharedCount,
-            repostByMe = model.repostByMe,
-            repostCount = model.repostCount,
-            address = model.address,
-            lat = model.lat,
-            lng = model.lng,
-            postType = model.postType,
-            videoUrl = model.videoUrl,
-            advUrl = model.advUrl,
-            countViews = model.countViews
-            // commentsByMe = model.commentsByMe,
-            // commentsCount = model.commentsCount,
+        fun fromModel(dto: PostModel) = PostResponseDto(
+            id = dto.id,
+            authorId = dto.authorId,
+            content = dto.content,
+            created = dto.created,
+            imageUrl = dto.imageUrl,
+            likedCount = dto.likedCount,
+            dislikedCount = dto.dislikedCount,
+            likedByMe = dto.likedByMe,
+            sharedCount = dto.sharedCount,
+            sharedByMe = dto.sharedByMe,
+            event = dto.event,
+            video = dto.video,
+            postType = dto.postType,
+            countViews = dto.countViews
         )
     }
 }
