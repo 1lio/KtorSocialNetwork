@@ -6,7 +6,7 @@ data class PostModel(
     val authorId: Long,
     val content: String,
     val created: Long,
-    val imageUrl: String,               // Прикрепленное изображение
+    val imageUrl: String?,               // Прикрепленное изображение
 
     // Likes
     var likedCount: Int = 0,

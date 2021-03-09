@@ -10,7 +10,7 @@ data class PostResponseDto(
     val authorId: Long,
     val content: String,
     val created: Long,
-    val imageUrl: String,
+    val imageUrl: String?,
     var likedCount: Int = 0,
     var dislikedCount: Int = 0,
     var likedByMe: Int = 0,
