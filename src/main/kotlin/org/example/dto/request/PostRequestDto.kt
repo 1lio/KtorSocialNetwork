@@ -11,17 +11,17 @@ data class PostRequestDto(
     val content: String,
     val created: Long,
     val imageUrl: String,
-    var likedCount: Int = 0,
-    var dislikedCount: Int = 0,
-    var likedByMe: Int = 0,             // 1 like, -1 dislike, 0 nothing
-    var repostCount: Int = 0,
-    var repostByMe: Boolean = false,
-    var sharedCount: Int = 0,
-    var sharedByMe: Boolean = false,
+    val likedCount: Int = 0,
+    val dislikedCount: Int = 0,
+    val likedByMe: Int = 0,             // 1 like, -1 dislike, 0 nothing
+    val repostCount: Int = 0,
+    val repostByMe: Boolean = false,
+    val sharedCount: Int = 0,
+    val sharedByMe: Boolean = false,
     val event: EventModel? = null,       // Событие подразумевает адрес и координаты
     val video: VideoModel? = null,       // Видеоконтент
-    var postType: PostType = PostType.POST,
-    var countViews: Int = 0,
+    val postType: PostType = PostType.POST,
+    val countViews: Int = 0,
 ) {
     companion object {
         fun toModel(dto: PostRequestDto) = PostModel(
