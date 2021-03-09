@@ -10,10 +10,23 @@ interface UserRepository {
     suspend fun getByUsername(username: String): UserModel?
     suspend fun save(item: UserModel): UserModel
 
-    suspend fun updateUserPosts(listLikes: List<Long>) : UserModel
-    suspend fun updateUserReposts(listLikes: List<Long>) : UserModel
-    suspend fun updateLikes(listLikes: List<Long>) : UserModel
-    suspend fun updateDislikes(listLikes: List<Long>) : UserModel
-    suspend fun updateShared(listLikes: List<Long>) : UserModel
+    // USER DATA
+    suspend fun getUserPostsIds(uId: Long): List<Long>
+    suspend fun getUserRepostsIds(uId: Long): List<Long>
+    suspend fun getLikesIds(uId: Long): List<Long>
+    suspend fun getDislikesIds(uId: Long): List<Long>
+    suspend fun getSharedIds(uId: Long): List<Long>
+
+    suspend fun saveUserPost(uId: Long,postId: Long): Long
+    suspend fun saveUserRepost(uId: Long,postId: Long): Long
+    suspend fun saveLike(uId: Long,postId: Long): Long
+    suspend fun saveDislike(uId: Long,postId: Long): Long
+    suspend fun saveShared(uId: Long,postId: Long): Long
+
+    suspend fun removeUserPostsById(uId: Long,postId: Long): List<Long>
+    suspend fun removeUserRepostsById(uId: Long,postId: Long): List<Long>
+    suspend fun removeLikesById(uId: Long,postId: Long): List<Long>
+    suspend fun removeDislikesById(uId: Long,postId: Long): List<Long>
+    suspend fun removeSharedById(uId: Long,postId: Long): List<Long>
 
 }

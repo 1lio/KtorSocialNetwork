@@ -49,23 +49,65 @@ class UserRepositoryInMemoryWithMutexImpl : UserRepository {
             }
         }
 
-    override suspend fun updateUserPosts(listLikes: List<Long>): UserModel {
+
+    override suspend fun getUserPostsIds(uId: Long): List<Long> {
+
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateUserReposts(listLikes: List<Long>): UserModel {
+    override suspend fun getUserRepostsIds(uId: Long): List<Long> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateLikes(listLikes: List<Long>): UserModel {
+    override suspend fun getLikesIds(uId: Long): List<Long> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateDislikes(listLikes: List<Long>): UserModel {
+    override suspend fun getDislikesIds(uId: Long): List<Long> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun updateShared(listLikes: List<Long>): UserModel {
+    override suspend fun getSharedIds(uId: Long): List<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun saveUserPost(uId: Long, postId: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun saveUserRepost(uId: Long, postId: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun saveLike(uId: Long, postId: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun saveDislike(uId: Long, postId: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun saveShared(uId: Long, postId: Long): Long {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun removeUserPostsById(uId: Long, postId: Long): List<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun removeUserRepostsById(uId: Long, postId: Long): List<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun removeLikesById(uId: Long, postId: Long): List<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun removeDislikesById(uId: Long, postId: Long): List<Long> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun removeSharedById(uId: Long, postId: Long): List<Long> {
         TODO("Not yet implemented")
     }
 }

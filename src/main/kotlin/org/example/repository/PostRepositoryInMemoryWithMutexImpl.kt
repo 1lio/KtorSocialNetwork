@@ -1,7 +1,6 @@
 package org.example.repository
 
 import io.ktor.features.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.example.model.PostModel
@@ -13,8 +12,7 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
 
     private val mutex = Mutex()
 
-    override suspend fun getAll(): List<PostModel> =
-        mutex.withLock {
+    override suspend fun getAll(): List<PostModel> = mutex.withLock {
 
             // Увеличиваем счетчик просмотров на всех item-ах
             items.forEachIndexed { index, postModel ->
@@ -52,7 +50,6 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
         }
     }
 
-    // Тут бага, что после удаления нам приходит 404 даже в случае удачного удаления
     override suspend fun removeById(id: Long) {
         mutex.withLock {
             items.removeIf { it.id == id }
@@ -64,14 +61,7 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
             -1 -> null
             else -> {
                 val item = items[index]
-                var countLike = item.likedCount
-
-                val copyItem = item.copy(
-                    dislikedCount = if (item.likedByMe < 1) item.dislikedCount.inc() else item.dislikedCount,
-                    likedByMe = if (item.likedByMe < 1) 1 else 0,
-                    likedCount = if (item.likedByMe < 1) ++countLike else --countLike,
-
-                    )
+                val copyItem = item.copy(likedCount = item.likedCount.inc())
                 items[index] = copyItem
                 copyItem
             }
@@ -83,15 +73,13 @@ class PostRepositoryInMemoryWithMutexImpl : PostRepository {
             -1 -> null
             else -> {
                 val item = items[index]
-                val copyItem = item.copy(
-                    dislikedCount = if (item.likedByMe >= 0) item.dislikedCount.inc() else item.dislikedCount.dec(),
-                    likedByMe = if (item.likedByMe >= 0) -1 else 0
-                )
+                val copyItem = item.copy(dislikedCount =  item.dislikedCount.inc())
                 items[index] = copyItem
                 copyItem
             }
         }
     }
+
 
     override suspend fun repostById(id: Long): PostModel? = mutex.withLock {
         when (val index = items.indexOfFirst { it.id == id }) {
