@@ -50,18 +50,18 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
         return PostResponseDto.fromModel(model)
     }
 
-    suspend fun likeById(id: Long): PostResponseDto {
+    suspend fun likeById(uId: Long, id: Long): PostResponseDto {
         // Ищем пост
-        val model = postRepo.likeById(id) ?: throw NotFoundException()
+        val model = postRepo.likeById(uId, id) ?: throw NotFoundException()
 
         // Сохраняем наш лайк
-       // userRepo.saveLike(userRepo.)
+       //  userRepo.saveLike(uId, id)
 
         return PostResponseDto.fromModel(model)
     }
 
-    suspend fun dislikeById(id: Long): PostResponseDto {
-        val model = postRepo.dislikeById(id) ?: throw NotFoundException()
+    suspend fun dislikeById(uId: Long, id: Long): PostResponseDto {
+        val model = postRepo.dislikeById(uId, id) ?: throw NotFoundException()
         return PostResponseDto.fromModel(model)
     }
 

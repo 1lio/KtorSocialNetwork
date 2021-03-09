@@ -67,6 +67,7 @@ class RoutingV1(
                         }
                     }
 
+
                     // Posts
                     route("/posts") {
 
@@ -101,13 +102,15 @@ class RoutingV1(
                         }
 
                         post("/{id}/like") {
+                            val me = call.authentication.principal<UserModel>()
                             val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
-                            call.respond(postService.likeById(id))
+                            call.respond(postService.likeById(me!!.id, id))
                         }
 
                         post("/{id}/dislike") {
+                            val me = call.authentication.principal<UserModel>()
                             val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
-                            call.respond(postService.likeById(id))
+                            call.respond(postService.dislikeById(me!!.id, id))
                         }
 
                         post("/{id}/reposts") {
