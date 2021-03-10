@@ -36,6 +36,12 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
         // Сохраняем в репозиторий
         val model = PostRequestDto.toModel(request)
         postRepo.save(model)
+
+        // Тащим из БД модель
+        val lastPost = postRepo.getAll().size.toLong()
+
+        userRepo.saveUserPost(model.authorId, lastPost)
+
         return PostResponseDto.fromModel(model)
     }
 
@@ -96,7 +102,7 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
     }
 
     suspend fun repostById(id: Long, user: UserModel, repostRequestDto: RepostRequestDto): PostResponseDto {
-      //  val reposted = postRepo.getById(id)
+        //  val reposted = postRepo.getById(id)
         /* val newPostForSave = PostModel(
              id = -1,
              authorId = user.id,
