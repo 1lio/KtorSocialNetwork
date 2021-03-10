@@ -1,15 +1,24 @@
 package org.example.repository
 
 import io.ktor.features.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.example.model.UserModel
+import org.example.service.UserService
 
 class UserRepositoryInMemoryWithMutexImpl : UserRepository {
 
     private var nextId = 1L
     private val items = mutableListOf<UserModel>()
     private val mutex = Mutex()
+
+    init {
+        // Создаем пользователя для проверки
+        runBlocking {
+            save(UserModel(id = 0L, username = "Test", password = "qwerty"))
+        }
+    }
 
     override suspend fun getAll(): List<UserModel> {
         mutex.withLock {
