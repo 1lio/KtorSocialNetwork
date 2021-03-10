@@ -17,22 +17,16 @@ class UserRepositoryInMemoryWithMutexImpl : UserRepository {
         }
     }
 
-    override suspend fun getById(id: Long): UserModel? {
-        mutex.withLock {
-            return items.find { it.id == id }
-        }
+    override suspend fun getById(id: Long): UserModel? = mutex.withLock {
+        items.find { it.id == id }
     }
 
-    override suspend fun getByIds(ids: Collection<Long>): List<UserModel> {
-        mutex.withLock {
-            return items.filter { ids.contains(it.id) }
-        }
+    override suspend fun getByIds(ids: Collection<Long>): List<UserModel> = mutex.withLock {
+        items.filter { ids.contains(it.id) }
     }
 
-    override suspend fun getByUsername(username: String): UserModel? {
-        mutex.withLock {
-            return items.find { it.username == username }
-        }
+    override suspend fun getByUsername(username: String): UserModel? = mutex.withLock {
+        items.find { it.username == username }
     }
 
     override suspend fun save(item: UserModel): UserModel =
@@ -53,89 +47,101 @@ class UserRepositoryInMemoryWithMutexImpl : UserRepository {
 
     override suspend fun getLikesIds(uId: Long): List<Long> = mutex.withLock {
         val model = getById(uId) ?: throw NotFoundException()
-
-        val posts = model.likedPosts ?: listOf()
-        println(posts)
-
-        posts
+        model.likedPosts
     }
 
     override suspend fun getDislikesIds(uId: Long): List<Long> = mutex.withLock {
         val model = getById(uId) ?: throw NotFoundException()
-        model.dislikedPosts ?: listOf()
+        model.dislikedPosts
     }
 
 
     override suspend fun getUserPostsIds(uId: Long): List<Long> = mutex.withLock {
         val model = getById(uId) ?: throw NotFoundException()
-        model.createdPosts ?: listOf()
+        model.createdPosts
     }
 
     override suspend fun getUserRepostsIds(uId: Long): List<Long> = mutex.withLock {
         val model = getById(uId) ?: throw NotFoundException()
-        model.repostedPost ?: listOf()
+        model.repostedPost
     }
 
     override suspend fun getSharedIds(uId: Long): List<Long> = mutex.withLock {
         val model = getById(uId) ?: throw NotFoundException()
-        model.sharedPosts ?: listOf()
+        model.sharedPosts
     }
 
     override suspend fun saveUserPost(uId: Long, postId: Long): Long = mutex.withLock {
-        println(uId)
-
         val user = items.find { it.id == postId } ?: throw NotFoundException()
         val list = user.createdPosts.toMutableList().apply { add(postId) }
-        println(user)
 
         items.remove(user)
         items.add(user.copy(likedPosts = list))
+        postId
+    }
 
-        println(user)
+    override suspend fun saveUserRepost(uId: Long, postId: Long): Long = mutex.withLock {
+        val user = items.find { it.id == postId } ?: throw NotFoundException()
+        val list = user.repostedPost.toMutableList()
+        list.add(postId)
+
+        items.remove(user)
+        items.add(user.copy(repostedPost = list.toList()))
 
         postId
     }
 
-    override suspend fun saveUserRepost(uId: Long, postId: Long): Long {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun saveLike(uId: Long, postId: Long): Long = mutex.withLock {
-        println(uId)
         val user = items.find { it.id == postId } ?: throw NotFoundException()
-        println(user)
-        val list = user.likedPosts.toMutableList() ?: mutableListOf()
+        val list = user.likedPosts.toMutableList()
         list.add(postId)
 
         items.remove(user)
         items.add(user.copy(likedPosts = list.toList()))
 
-        println(user)
-
         postId
     }
 
     override suspend fun saveDislike(uId: Long, postId: Long): Long = mutex.withLock {
-
         val user = items.find { it.id == postId } ?: throw NotFoundException()
-        val list = user.dislikedPosts.toMutableList().apply { add(postId) }
+        val list = user.dislikedPosts.toMutableList()
+        list.add(postId)
 
         items.remove(user)
-        items.add(user.copy(dislikedPosts = list))
+        items.add(user.copy(dislikedPosts = list.toList()))
 
         postId
     }
 
-    override suspend fun saveShared(uId: Long, postId: Long): Long {
-        TODO("Not yet implemented")
+    override suspend fun saveShared(uId: Long, postId: Long): Long = mutex.withLock {
+        val user = items.find { it.id == postId } ?: throw NotFoundException()
+        val list = user.sharedPosts.toMutableList()
+        list.add(postId)
+
+        items.remove(user)
+        items.add(user.copy(sharedPosts = list.toList()))
+
+        postId
     }
 
-    override suspend fun removeUserPostsById(uId: Long, postId: Long): List<Long> {
-        TODO("Not yet implemented")
+    override suspend fun removeUserPostsById(uId: Long, postId: Long): List<Long> = mutex.withLock {
+        val user = items.find { it.id == postId } ?: throw NotFoundException()
+        val list = user.createdPosts.toMutableList().apply { remove(postId) }
+
+        items.remove(user)
+        items.add(user.copy(createdPosts = list))
+
+        list
     }
 
-    override suspend fun removeUserRepostsById(uId: Long, postId: Long): List<Long> {
-        TODO("Not yet implemented")
+    override suspend fun removeUserRepostsById(uId: Long, postId: Long): List<Long> = mutex.withLock {
+        val user = items.find { it.id == postId } ?: throw NotFoundException()
+        val list = user.repostedPost.toMutableList().apply { remove(postId) }
+
+        items.remove(user)
+        items.add(user.copy(repostedPost = list))
+
+        list
     }
 
     override suspend fun removeLikesById(uId: Long, postId: Long): List<Long> = mutex.withLock {
@@ -149,11 +155,25 @@ class UserRepositoryInMemoryWithMutexImpl : UserRepository {
         list
     }
 
-    override suspend fun removeDislikesById(uId: Long, postId: Long): List<Long> {
-        TODO("Not yet implemented")
+    override suspend fun removeDislikesById(uId: Long, postId: Long): List<Long> = mutex.withLock {
+
+        val user = items.find { it.id == postId } ?: throw NotFoundException()
+        val list = user.dislikedPosts.toMutableList().apply { remove(postId) }
+
+        items.remove(user)
+        items.add(user.copy(dislikedPosts = list))
+
+        list
     }
 
-    override suspend fun removeSharedById(uId: Long, postId: Long): List<Long> {
-        TODO("Not yet implemented")
+    override suspend fun removeSharedById(uId: Long, postId: Long): List<Long> = mutex.withLock {
+
+        val user = items.find { it.id == postId } ?: throw NotFoundException()
+        val list = user.sharedPosts.toMutableList().apply { remove(postId) }
+
+        items.remove(user)
+        items.add(user.copy(sharedPosts = list))
+
+        list
     }
 }
