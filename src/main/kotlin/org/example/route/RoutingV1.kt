@@ -120,6 +120,12 @@ class RoutingV1(
                             val repostRequestDto = call.receive<RepostRequestDto>()
                             call.respond(postService.repostById(id, me!!, repostRequestDto))
                         }
+
+                        post("/{id}/share") {
+                            val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
+                            val uId = call.authentication.principal<UserModel>()?.id  ?: throw Throwable()
+                            call.respond(postService.shareById(uId,id))
+                        }
                     }
                 }
 

@@ -4,6 +4,7 @@ import io.ktor.features.*
 import org.example.dto.request.PostRequestDto
 import org.example.dto.request.RepostRequestDto
 import org.example.dto.responce.PostResponseDto
+import org.example.dto.responce.PostShareResponseDto
 import org.example.exception.ForbiddenException
 import org.example.model.PostModel
 import org.example.model.UserModel
@@ -132,22 +133,61 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
         return PostResponseDto.fromModel(copyModel)
     }
 
+    suspend fun repostById(id: Long, user: UserModel, request: RepostRequestDto): PostResponseDto {
 
-    suspend fun repostById(id: Long, user: UserModel, repostRequestDto: RepostRequestDto): PostResponseDto {
-        //  val reposted = postRepo.getById(id)
-        /* val newPostForSave = PostModel(
-             id = -1,
-             authorId = user.id,
-             content = repostRequestDto.content,
-             created = System.currentTimeMillis(),
-             postType = PostType.REPOST,
-             // source = reposted
-         )*/
-        //   val repost = repo.save(newPostForSave)
-        TODO("//")
-        //return PostResponseDto.fromModel(repost)
+        // Чекаем создан ли Post пользователем.
+        /*    if (request.id != user.id) {
+                throw ForbiddenException("Access deny!")
+            }
+    */
+        // Сохраняем в репозиторий
+        //  val model = PostRequestDto.toModel(request)
+        // postRepo.save(model)
+
+        // Тащим из БД модель
+        //val lastPost = postRepo.getAll().size.toLong()
+
+        //userRepo.saveUserPost(model.authorId, lastPost)
+
+        // return PostResponseDto.fromModel(model)
+        TODO()
     }
 
+
+    suspend fun shareById(uId: Long, id: Long): PostShareResponseDto {
+        // находим юзера
+        val user = userRepo.getById(uId) ?: throw NotFoundException()
+
+        // Находим модель
+        val model = postRepo.getById(id) ?: throw NotFoundException()
+
+        // Чекаем лайки юзера
+        val userSharePosts: List<Long> = user.sharedPosts
+
+        val copyModel: PostModel
+
+        if (userSharePosts.isNullOrEmpty()) {
+            // Сохраняем в репозиторий пользователя
+            copyModel = model.copy(sharedByMe = true, sharedCount = model.dislikedCount.inc())
+            userRepo.saveShared(uId, id)
+        } else {
+            if (userSharePosts.first { id == it } != 0L) {
+                // Снимаем
+                copyModel = model.copy(sharedByMe = false, sharedCount = model.dislikedCount.dec())
+                userRepo.removeSharedById(uId, id)
+
+            } else {
+                // Сохраняем
+                copyModel = model.copy(sharedByMe = true, sharedCount = model.dislikedCount.inc())
+                userRepo.saveShared(uId, id)
+            }
+        }
+
+        // Сохраняем лайк в репозиторий
+        postRepo.save(copyModel)
+
+        return PostShareResponseDto("http://127.0.0.1:8080/api/v1/posts/$id")
+    }
 
     private suspend fun PostModel.castFromUserData(uId: Long): PostModel {
 
