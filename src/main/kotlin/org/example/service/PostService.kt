@@ -5,6 +5,7 @@ import org.example.dto.request.PostRequestDto
 import org.example.dto.request.RepostRequestDto
 import org.example.dto.responce.PostResponseDto
 import org.example.exception.ForbiddenException
+import org.example.model.PostModel
 import org.example.model.UserModel
 import org.example.repository.PostRepository
 import org.example.repository.UserRepository
@@ -20,6 +21,7 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
         // Чекаем пользовательский ли пост
         val userData = userRepo.getById(model.id)
 
+        // В ответе формируем лист с пользовательскими лайками/дизами/репостами и т.п.
         return PostResponseDto.fromModel(model)
     }
 
@@ -51,14 +53,42 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
     }
 
     suspend fun likeById(uId: Long, id: Long): PostResponseDto {
-        // Ищем пост
-        val model = postRepo.likeById(uId, id) ?: throw NotFoundException()
 
-        // Сохраняем наш лайк
-       //  userRepo.saveLike(uId, id)
+        // находим юзера
+        val user = userRepo.getById(uId) ?: throw NotFoundException()
 
-        return PostResponseDto.fromModel(model)
+        // Находим модель
+        val model = postRepo.getById(id) ?: throw NotFoundException()
+
+        // Чекаем лайки юзера
+        val userLikedPosts: List<Long> = user.likedPosts
+
+        val copyModel: PostModel
+        // Лайкал ли он хотябы раз
+        if (userLikedPosts.isNullOrEmpty()) {
+            // Сохраняем лайк в репозиторий пользователя
+            copyModel = model.copy(likedByMe = 1, likedCount = model.likedCount.inc())
+            userRepo.saveLike(uId, id)
+        } else {
+            // Ищем среди лакнутых постов наш
+            if (userLikedPosts.first { id == it } != 0L) {
+                // Снимаем лайк
+                copyModel = model.copy(likedByMe = 0, likedCount = model.likedCount.dec())
+                userRepo.removeLikesById(uId, id)
+
+            } else {
+                // Сохраняем лайк
+                copyModel = model.copy(likedByMe = 1, likedCount = model.likedCount.inc())
+                userRepo.saveLike(uId, id)
+            }
+
+        }
+
+        // Сохраняем лайк в репозиторий
+        postRepo.save(copyModel)
+        return PostResponseDto.fromModel(copyModel)
     }
+
 
     suspend fun dislikeById(uId: Long, id: Long): PostResponseDto {
         val model = postRepo.dislikeById(uId, id) ?: throw NotFoundException()
@@ -66,7 +96,7 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
     }
 
     suspend fun repostById(id: Long, user: UserModel, repostRequestDto: RepostRequestDto): PostResponseDto {
-        val reposted = postRepo.getById(id)
+      //  val reposted = postRepo.getById(id)
         /* val newPostForSave = PostModel(
              id = -1,
              authorId = user.id,

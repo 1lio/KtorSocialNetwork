@@ -5,11 +5,11 @@ import org.example.model.UserModel
 class UserResponseDto(
     val id: Long,
     val username: String,
-    val createdPosts: Map<Long, List<Long>> = mapOf(),
-    val likedPosts: Map<Long, List<Long>> = mapOf(),
-    val dislikedPosts: Map<Long, List<Long>> = mapOf(),
-    val repostedPost: Map<Long, List<Long>> = mapOf(),
-    val sharedPosts: Map<Long, List<Long>> = mapOf(),
+    val createdPosts: List<Long> = listOf(),
+    val likedPosts: List<Long> = listOf(),
+    val dislikedPosts: List<Long> = listOf(),
+    val repostedPost: List<Long> = listOf(),
+    val sharedPosts: List<Long> = listOf(),
 ) {
     companion object {
         fun fromModel(model: UserModel) = UserResponseDto(

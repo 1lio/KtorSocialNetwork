@@ -7,11 +7,11 @@ data class UserModel(
     val username: String,
     val password: String,
 
-    // Храним в мапах Ключ id пользователя list id шники постов
-    val createdPosts: Map<Long, List<Long>> = mapOf(),
-    val likedPosts: Map<Long, List<Long>> = mapOf(),
-    val dislikedPosts: Map<Long, List<Long>> = mapOf(),
-    val repostedPost: Map<Long, List<Long>> = mapOf(),
-    val sharedPosts: Map<Long, List<Long>> = mapOf()
+    // Так делать не хорошо, нужно создавать отдельную таблицу дял каждой сущности.
+    val createdPosts: List<Long> = listOf(),
+    val likedPosts: List<Long> = listOf(),
+    val dislikedPosts: List<Long> = listOf(),
+    val repostedPost: List<Long> = listOf(),
+    val sharedPosts: List<Long> = listOf()
 
 ) : Principal
