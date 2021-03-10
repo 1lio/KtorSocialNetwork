@@ -133,24 +133,36 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
         return PostResponseDto.fromModel(copyModel)
     }
 
-    suspend fun repostById(id: Long, user: UserModel, request: RepostRequestDto): PostResponseDto {
+    suspend fun repostById(request: RepostRequestDto, user: UserModel): PostResponseDto {
 
-        // Чекаем создан ли Post пользователем.
-        /*    if (request.id != user.id) {
-                throw ForbiddenException("Access deny!")
+        // Находим модель
+        val post = postRepo.getById(request.parentPostId) ?: throw NotFoundException()
+
+        val userReposts: List<Long> = user.sharedPosts
+
+        val copyModel: PostModel
+
+        if (userReposts.isNullOrEmpty()) {
+            // Сохраняем в репозиторий пользователя
+            copyModel = post.copy(repostByMe = true, repostCount = post.repostCount.inc())
+            userRepo.saveUserRepost(request.authorId, request.parentPostId)
+        } else {
+            if (userReposts.first { request.parentPostId == it } != 0L) {
+                // Снимаем
+                copyModel = post.copy(repostByMe = false, repostCount = post.repostCount.dec())
+                userRepo.removeUserRepostsById(request.authorId, request.parentPostId)
+
+            } else {
+                // Сохраняем
+                copyModel = post.copy(repostByMe = true, repostCount = post.repostCount.inc())
+                userRepo.saveUserRepost(request.authorId, request.parentPostId)
             }
-    */
-        // Сохраняем в репозиторий
-        //  val model = PostRequestDto.toModel(request)
-        // postRepo.save(model)
+        }
 
-        // Тащим из БД модель
-        //val lastPost = postRepo.getAll().size.toLong()
+        // Сохраняем лайк в репозиторий
+        postRepo.save(copyModel)
 
-        //userRepo.saveUserPost(model.authorId, lastPost)
-
-        // return PostResponseDto.fromModel(model)
-        TODO()
+        return PostResponseDto.fromModel(copyModel)
     }
 
 
@@ -168,17 +180,17 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
 
         if (userSharePosts.isNullOrEmpty()) {
             // Сохраняем в репозиторий пользователя
-            copyModel = model.copy(sharedByMe = true, sharedCount = model.dislikedCount.inc())
+            copyModel = model.copy(sharedByMe = true, sharedCount = model.sharedCount.inc())
             userRepo.saveShared(uId, id)
         } else {
             if (userSharePosts.first { id == it } != 0L) {
                 // Снимаем
-                copyModel = model.copy(sharedByMe = false, sharedCount = model.dislikedCount.dec())
+                copyModel = model.copy(sharedByMe = false, sharedCount = model.sharedCount.dec())
                 userRepo.removeSharedById(uId, id)
 
             } else {
                 // Сохраняем
-                copyModel = model.copy(sharedByMe = true, sharedCount = model.dislikedCount.inc())
+                copyModel = model.copy(sharedByMe = true, sharedCount = model.sharedCount.inc())
                 userRepo.saveShared(uId, id)
             }
         }

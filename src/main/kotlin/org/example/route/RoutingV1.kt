@@ -114,11 +114,10 @@ class RoutingV1(
                             call.respond(postService.dislikeById(me!!.id, id))
                         }
 
-                        post("/{id}/reposts") {
-                            val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
-                            val me = call.authentication.principal<UserModel>()
+                        post("/repost") {
+                            val me = call.authentication.principal<UserModel>() ?: throw Throwable()
                             val repostRequestDto = call.receive<RepostRequestDto>()
-                            call.respond(postService.repostById(id, me!!, repostRequestDto))
+                            call.respond(postService.repostById(repostRequestDto, me))
                         }
 
                         post("/{id}/share") {
