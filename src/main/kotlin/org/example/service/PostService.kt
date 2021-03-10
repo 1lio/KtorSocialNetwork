@@ -18,9 +18,6 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
 
         val model = postRepo.getById(id) ?: throw NotFoundException()
 
-        // Чекаем пользовательский ли пост
-        val userData = userRepo.getById(model.id)
-
         // В ответе формируем лист с пользовательскими лайками/дизами/репостами и т.п.
         return PostResponseDto.fromModel(model)
     }
@@ -97,9 +94,43 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
 
 
     suspend fun dislikeById(uId: Long, id: Long): PostResponseDto {
-        val model = postRepo.dislikeById(uId, id) ?: throw NotFoundException()
-        return PostResponseDto.fromModel(model)
+        // находим юзера
+        val user = userRepo.getById(uId) ?: throw NotFoundException()
+
+        // Находим модель
+        val model = postRepo.getById(id) ?: throw NotFoundException()
+
+        // Чекаем лайки юзера
+        val userLikedPosts: List<Long> = user.dislikedPosts
+
+        val copyModel: PostModel
+        // Лайкал ли он хотябы раз
+        if (userLikedPosts.isNullOrEmpty()) {
+            // Сохраняем лайк в репозиторий пользователя
+            copyModel = model.copy(likedByMe = -1, dislikedCount = model.dislikedCount.inc())
+            userRepo.saveDislike(uId, id)
+        } else {
+            // Ищем среди лакнутых постов наш
+            if (userLikedPosts.first { id == it } != 0L) {
+                // Снимаем лайк
+                copyModel = model.copy(likedByMe = 0, dislikedCount = model.dislikedCount.dec())
+                userRepo.removeDislikesById(uId, id)
+
+            } else {
+                // Сохраняем лайк
+                copyModel = model.copy(likedByMe = -1, dislikedCount = model.dislikedCount.inc())
+                userRepo.saveDislike(uId, id)
+            }
+        }
+
+        // Сохраняем лайк в репозиторий
+        postRepo.save(copyModel)
+        return PostResponseDto.fromModel(copyModel)
     }
+
+
+
+
 
     suspend fun repostById(id: Long, user: UserModel, repostRequestDto: RepostRequestDto): PostResponseDto {
         //  val reposted = postRepo.getById(id)

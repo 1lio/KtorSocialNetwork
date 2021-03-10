@@ -49,7 +49,6 @@ class UserService(
 
     suspend fun saveNewModel(username: String, password: String): UserModel {
         val model = UserModel(username = username, password = passwordEncoder.encode(password))
-        println("User $username is saved!")
         return repo.save(model)
     }
 
