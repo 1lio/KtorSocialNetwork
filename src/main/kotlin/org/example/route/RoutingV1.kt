@@ -67,12 +67,12 @@ class RoutingV1(
                         }
                     }
 
-
                     // Posts
                     route("/posts") {
 
                         get {
-                            call.respond(postService.getAll())
+                            val me = call.authentication.principal<UserModel>() ?: throw Throwable()
+                            call.respond(postService.getAll(me.id))
                         }
 
                         post {
@@ -83,8 +83,9 @@ class RoutingV1(
                         }
 
                         get("/{id}") {
+                            val me = call.authentication.principal<UserModel>() ?: throw Throwable()
                             val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
-                            call.respond(postService.getById(id))
+                            call.respond(postService.getById(me.id, id))
                         }
 
                         delete("/{id}") {

@@ -12,14 +12,18 @@ import org.example.repository.UserRepository
 
 class PostService(private val postRepo: PostRepository, private val userRepo: UserRepository) {
 
-    suspend fun getAll(): List<PostResponseDto> = postRepo.getAll().map(PostResponseDto.Companion::fromModel)
+    suspend fun getAll(uId: Long): List<PostResponseDto> {
+        return postRepo.getAll().map { PostResponseDto.fromModel(it.castFromUserData(uId)) }
+    }
 
-    suspend fun getById(id: Long): PostResponseDto {
+    suspend fun getById(uId: Long, id: Long): PostResponseDto {
+
+        // находим юзера
+        val user = userRepo.getById(uId) ?: throw NotFoundException()
 
         val model = postRepo.getById(id) ?: throw NotFoundException()
-
         // В ответе формируем лист с пользовательскими лайками/дизами/репостами и т.п.
-        return PostResponseDto.fromModel(model)
+        return PostResponseDto.fromModel(model.castFromUserData(user.id))
     }
 
     // Сохранение / изменение
@@ -52,7 +56,7 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
             throw ForbiddenException("Access deny!")
         }
         postRepo.removeById(id)
-        return PostResponseDto.fromModel(model)
+        return PostResponseDto.fromModel(model.castFromUserData(model.id))
     }
 
     suspend fun likeById(uId: Long, id: Long): PostResponseDto {
@@ -89,7 +93,7 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
 
         // Сохраняем лайк в репозиторий
         postRepo.save(copyModel)
-        return PostResponseDto.fromModel(copyModel)
+        return PostResponseDto.fromModel(copyModel.castFromUserData(model.id))
     }
 
 
@@ -129,9 +133,6 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
     }
 
 
-
-
-
     suspend fun repostById(id: Long, user: UserModel, repostRequestDto: RepostRequestDto): PostResponseDto {
         //  val reposted = postRepo.getById(id)
         /* val newPostForSave = PostModel(
@@ -147,5 +148,33 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
         //return PostResponseDto.fromModel(repost)
     }
 
+
+    private suspend fun PostModel.castFromUserData(uId: Long): PostModel {
+
+        // находим юзера
+        val user = userRepo.getById(uId) ?: throw NotFoundException()
+
+        val isLikeByMe = when {
+            user.likedPosts.find { this.id == it } ?: 0 > 0 -> 1
+            user.dislikedPosts.find { this.id == it } ?: 0 > 0 -> -1
+            else -> 0
+        }
+
+        val isRepostByMe = when {
+            user.repostedPost.find { this.id == it } ?: 0 > 0 -> true
+            else -> false
+        }
+
+        val isSharedByMe = when {
+            user.sharedPosts.find { this.id == it } ?: 0 > 0 -> true
+            else -> false
+        }
+
+        return this.copy(
+            likedByMe = isLikeByMe,
+            repostByMe = isRepostByMe,
+            sharedByMe = isSharedByMe
+        )
+    }
 
 }
