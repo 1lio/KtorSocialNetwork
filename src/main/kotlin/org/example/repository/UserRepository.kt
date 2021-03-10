@@ -10,7 +10,7 @@ interface UserRepository {
     suspend fun getByUsername(username: String): UserModel?
     suspend fun save(item: UserModel): UserModel
 
-    // USER DATA
+    // USER DATA Похорошему это должна быть отдельная сущность
     suspend fun getUserPostsIds(uId: Long): List<Long>
     suspend fun getUserRepostsIds(uId: Long): List<Long>
     suspend fun getLikesIds(uId: Long): List<Long>
