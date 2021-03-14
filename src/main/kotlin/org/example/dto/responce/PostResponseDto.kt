@@ -38,6 +38,8 @@ data class PostResponseDto(
             event = dto.event,
             video = dto.video,
             postType = dto.postType,
+            repostCount = dto.repostCount,
+            repostByMe = dto.repostByMe,
             countViews = dto.countViews
         )
     }

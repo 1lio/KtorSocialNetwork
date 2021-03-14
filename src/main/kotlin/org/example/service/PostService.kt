@@ -11,7 +11,10 @@ import org.example.model.UserModel
 import org.example.repository.PostRepository
 import org.example.repository.UserRepository
 
-class PostService(private val postRepo: PostRepository, private val userRepo: UserRepository) {
+class PostService(
+    private val postRepo: PostRepository,
+    private val userRepo: UserRepository
+) {
 
     suspend fun getAll(uId: Long): List<PostResponseDto> {
         return postRepo.getAll().map { PostResponseDto.fromModel(it.castFromUserData(uId)) }
@@ -133,13 +136,15 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
         return PostResponseDto.fromModel(copyModel)
     }
 
-    suspend fun repostById(request: RepostRequestDto, user: UserModel): PostResponseDto {
+    suspend fun repostById(request: RepostRequestDto, user1: UserModel): PostResponseDto {
+
+        // находим юзера
+        val user = userRepo.getById(user1.id) ?: throw NotFoundException()
 
         // Находим модель
         val post = postRepo.getById(request.parentPostId) ?: throw NotFoundException()
 
-        val userReposts: List<Long> = user.sharedPosts
-
+        val userReposts: List<Long> = user.repostedPost
         val copyModel: PostModel
 
         if (userReposts.isNullOrEmpty()) {
@@ -159,7 +164,9 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
             }
         }
 
-        // Сохраняем лайк в репозиторий
+        println(copyModel)
+
+        // Сохраняем в репозиторий
         postRepo.save(copyModel)
 
         return PostResponseDto.fromModel(copyModel)
@@ -167,15 +174,11 @@ class PostService(private val postRepo: PostRepository, private val userRepo: Us
 
 
     suspend fun shareById(uId: Long, id: Long): PostShareResponseDto {
-        // находим юзера
         val user = userRepo.getById(uId) ?: throw NotFoundException()
-
-        // Находим модель
         val model = postRepo.getById(id) ?: throw NotFoundException()
 
         // Чекаем лайки юзера
         val userSharePosts: List<Long> = user.sharedPosts
-
         val copyModel: PostModel
 
         if (userSharePosts.isNullOrEmpty()) {
