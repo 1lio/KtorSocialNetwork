@@ -108,10 +108,23 @@ class RoutingV1(
                             call.respond(postService.likeById(me!!.id, id))
                         }
 
+
+                        delete("/{id}/like") {
+                            val me = call.authentication.principal<UserModel>()
+                            val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
+                            call.respond(postService.removeLike(me!!.id, id))
+                        }
+
                         post("/{id}/dislike") {
                             val me = call.authentication.principal<UserModel>()
                             val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
                             call.respond(postService.dislikeById(me!!.id, id))
+                        }
+
+                        delete("/{id}/dislike") {
+                            val me = call.authentication.principal<UserModel>()
+                            val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
+                            call.respond(postService.removeDislike(me!!.id, id))
                         }
 
                         post("/repost") {
@@ -122,8 +135,8 @@ class RoutingV1(
 
                         post("/{id}/share") {
                             val id = call.parameters["id"]?.toLongOrNull() ?: throw idParameterConversionException
-                            val uId = call.authentication.principal<UserModel>()?.id  ?: throw Throwable()
-                            call.respond(postService.shareById(uId,id))
+                            val uId = call.authentication.principal<UserModel>()?.id ?: throw Throwable()
+                            call.respond(postService.shareById(uId, id))
                         }
                     }
                 }

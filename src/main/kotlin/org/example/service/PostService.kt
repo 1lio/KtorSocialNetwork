@@ -101,6 +101,31 @@ class PostService(
     }
 
 
+    suspend fun removeLike(uId: Long, id: Long): PostResponseDto {
+        // находим юзера
+        val user = userRepo.getById(uId) ?: throw NotFoundException()
+
+        // Находим модель
+        val model = postRepo.getById(id) ?: throw NotFoundException()
+
+        // Чекаем лайки юзера
+        val userLikedPosts: List<Long> = user.likedPosts
+
+        var copyModel: PostModel = model.copy()
+
+        // Ищем среди лакнутых постов наш
+        if (userLikedPosts.first { id == it } != 0L) {
+            // Снимаем лайк
+            copyModel = model.copy(likedByMe = 0, likedCount = model.likedCount.dec())
+            userRepo.removeLikesById(uId, id)
+        }
+
+        // Сохраняем лайк в репозиторий
+        postRepo.save(copyModel)
+        return PostResponseDto.fromModel(copyModel.castFromUserData(model.id))
+    }
+
+
     suspend fun dislikeById(uId: Long, id: Long): PostResponseDto {
         // находим юзера
         val user = userRepo.getById(uId) ?: throw NotFoundException()
@@ -135,6 +160,32 @@ class PostService(
         postRepo.save(copyModel)
         return PostResponseDto.fromModel(copyModel)
     }
+
+
+    suspend fun removeDislike(uId: Long, id: Long): PostResponseDto {
+        // находим юзера
+        val user = userRepo.getById(uId) ?: throw NotFoundException()
+
+        // Находим модель
+        val model = postRepo.getById(id) ?: throw NotFoundException()
+
+        // Чекаем лайки юзера
+        val userLikedPosts: List<Long> = user.dislikedPosts
+
+        var copyModel: PostModel = model.copy()
+
+        // Ищем среди лакнутых постов наш
+        if (userLikedPosts.first { id == it } != 0L) {
+            // Снимаем дизлайк
+            copyModel = model.copy(likedByMe = 0, likedCount = model.dislikedCount.dec())
+            userRepo.removeLikesById(uId, id)
+        }
+
+        // Сохраняем лайк в репозиторий
+        postRepo.save(copyModel)
+        return PostResponseDto.fromModel(copyModel.castFromUserData(model.id))
+    }
+
 
     suspend fun repostById(request: RepostRequestDto, user1: UserModel): PostResponseDto {
 
